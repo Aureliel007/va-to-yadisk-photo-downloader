@@ -54,7 +54,7 @@ class VkPhotosDownloader:
             os.mkdir('vk_photos')
         data = self.get_photos(count)
         file_names = {} # в этот словарь будут сохраняться имена файлов и тип размера
-
+        counter = 0
         for item in data['response']['items']:
             max_width = 0
 
@@ -75,6 +75,9 @@ class VkPhotosDownloader:
                 path = os.path.join('vk_photos', file_name)
                 with open(path, 'wb') as file:
                     file.write(response.content)
+            
+            counter += 1
+            print(f"Загружено {counter} фото из {count}")
         
         return file_names
             
@@ -97,6 +100,7 @@ class YaDiskUploader:
         photos = self.photos
         request_url = self.base_url + 'v1/disk/resources/upload'
         report = []
+        counter = 0
         for photo in photos:
             path = f"{folder_path}/{photo}"
             params = {
@@ -109,6 +113,9 @@ class YaDiskUploader:
             with open(file_path, 'rb') as file:
                 response = requests.put(url, files={'file': file})
                 report.append({'file_name': photo, 'size': photos[photo]})
+
+            counter += 1
+            print(f"Выгружено на Яндекс Диск {counter} фото из {len(photos)}")
         
         with open('report.json', 'w') as file:  # Отчет о загрузке будет записан в файл
             json.dump(report, file, indent=4)
