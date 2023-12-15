@@ -1,23 +1,17 @@
 import requests
 import json
-from urllib.parse import urlencode
 import os
+import yaml
 
-def get_token():
-    app_id = '51812835'
-    base_url = 'https://oauth.vk.com/authorize'
-    params = {
-        'client_id': app_id,
-        'redirect_uri': 'https://oauth.vk.com/blank.html',
-        'display': 'page',
-        'scope': 'photos',
-        'response_type': 'token'
-    }
+if os.path.exists('settings.yaml'):
+    with open('settings.yaml', 'r') as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+else:
+    print('Заполните файл settings.yaml в соответствии с инструкцией в файле README.md')
 
-    oauth_url = f'{base_url}?{urlencode(params)}'
-    print(f'Перейдите по ссылке и скопируйте токен: {oauth_url}')
-    token = input('Введите полученный токен: ')
-    return token
+access_token = data['vk_token']
+ya_access_token = 'OAuth ' + data['ya_disk_token']
+user_id = input('Введите свой VK user ID: ')
 
 class VkPhotosDownloader:
 
@@ -120,10 +114,6 @@ class YaDiskUploader:
         with open('report.json', 'w') as file:  # Отчет о загрузке будет записан в файл
             json.dump(report, file, indent=4)
 
-
-access_token = get_token()
-user_id = input('Введите свой VK user ID: ')
-ya_access_token = 'OAuth ' + input('Введите свой токен для получения доступа к Яндекс Диску: ')
 vk = VkPhotosDownloader(access_token, user_id)
 photos_names = vk.download_photos()
 ya = YaDiskUploader(ya_access_token, photos_names)
